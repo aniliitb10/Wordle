@@ -7,5 +7,8 @@ include_directories(include)
 # including tests
 file(GLOB gTestSource "test/*.cpp")
 
+# create executables
 add_executable(Wordle main.cpp ${gTestSource})
+add_executable(WordleClient word_client_main.cpp)
+
 target_link_libraries(Wordle gtest pthread)

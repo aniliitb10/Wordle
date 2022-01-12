@@ -9,8 +9,13 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 #include <fstream>
+#include <charconv>
+#include <exception>
+#include <sstream>
 
+// read a file, line by line and strip carriage/new-line characters
 inline
 std::vector<std::string> read_lines(const std::string& filepath, bool ignore_empty = true)
 {
@@ -51,4 +56,38 @@ std::ostream& operator<< (std::ostream& ostream, const std::vector<std::string>&
         ostream << str << "\n";
     }
     return ostream;
+}
+
+// If input is not valid, it asks for input again and never throws
+template<class Func>
+[[nodiscard]] std::string get_valid_input(std::size_t word_size, const Func &validator) noexcept
+{
+    std::string input{};
+    std::getline(std::cin, input);
+
+    auto itr = std::find_if_not(input.begin(), input.end(), validator);
+    while (input.size() != word_size || itr != input.end())
+    {
+        std::cout << "Invalid input [" << input << "] is received, please try again: ";
+        std::getline(std::cin, input);
+        itr = std::find_if_not(input.begin(), input.end(), validator);
+    }
+    return input;
+}
+
+// if input is not valid, it throws
+template <typename T = std::size_t >
+T from_string(const std::string& src)
+{
+    T value{};
+
+    auto res = std::from_chars(src.data(), src.data() + src.size(), value);
+    if (res.ec != std::errc() || res.ptr != src.data() + src.size())
+    {
+        std::stringstream  os;
+        os << "Invalid string received [" << src << "]";
+        throw std::invalid_argument(os.str());
+    }
+    
+    return value;
 }

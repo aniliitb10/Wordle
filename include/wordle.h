@@ -91,8 +91,16 @@ public:
                 if (y_count > 0)                    remove_n(c, y_count + 1);
                 if (g_count > 0)                    remove_n(c, g_count + 1);
 
-                // done a lot of processing on this, hence better to avoid them again
-                std::replace(str.begin(), str.end(), c, '\0');
+                // Already processed all @c in the string, so let's just mark them processed
+                for (std::size_t itr{0}; itr < _word_size; ++itr)
+                {
+                    if (str[itr] == c)
+                    {
+                        str[itr] = '\0';
+                        status[itr] = '\0';
+                    }
+                }
+
             } else if (s == 'y')
             {
                 exists(c);
