@@ -1,7 +1,4 @@
 #include <gtest/gtest.h>
-#include <wordle.h>
-#include <iostream>
-#include <wordle_client.h>
 
 int main(int argc_, char** argv_)
 {
