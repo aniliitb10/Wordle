@@ -1,8 +1,8 @@
 # Wordle
-To help solve the word puzzle at https://www.powerlanguage.co.uk/wordle/ or https://qntm.org/files/wordle/index.html
+To help solve the word puzzle at https://www.powerlanguage.co.uk/wordle/ and https://qntm.org/files/wordle/index.html
 
 
-WordleClient is the interactive excutable to help play the game. It keeps suggesting words for the game and based on the status of these words, it keeps updating its set of possible words.
+WordleClient is an interactive command-line application to help play the game. It keeps suggesting words for the game and based on the status of these words, it keeps updating its set of possible words.
 
 Please note that:
 

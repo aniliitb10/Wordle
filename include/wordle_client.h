@@ -16,6 +16,8 @@ public:
         std::cout << "Welcome! word size is: [" << _word_size << "], display limit is: [" << _display_limit << "]\n";
     }
 
+    // prints status, accepts test string and status
+    // runs in infinite loop, unless target word is found or there are no more words in dictionary to suggest
     void run() noexcept
     {
         print_update();
@@ -39,12 +41,15 @@ public:
 
 private:
 
+    // checks if the target word has been found
     [[nodiscard]] static bool found(const std::string &status) noexcept
     {
         return std::all_of(status.cbegin(), status.cend(), [](char c)
         { return c == 'g'; });
     }
 
+    // reads valid word from terminal
+    // if user enters status instead, user gets another chance to enter word again
     [[nodiscard]] std::string get_word() const noexcept
     {
         std::cout << "Enter the selected word: ";
@@ -67,6 +72,7 @@ private:
         return input;
     }
 
+    // reads valid status string from terminal
     [[nodiscard]] std::string get_status() const noexcept
     {
         std::cout << "Enter the status of previous word: ";
@@ -74,6 +80,7 @@ private:
         { return c == 'b' || c == 'g' || c == 'y'; });
     }
 
+    // prints the status on terminal
     void print_update() const noexcept
     {
         if (_wordle.get_words().size() > _display_limit)
@@ -90,6 +97,7 @@ private:
         }
     }
 
+    // Randomly selects strings from available set to allow users to choose from
     [[nodiscard]] std::vector<std::string> sample_strings() const noexcept
     {
         const auto &words = _wordle.get_words();

@@ -35,7 +35,7 @@ public:
      * @param str: the string which was tested
      * @param status: the string containing the output for test string,
      *                e.g. in "bbggy", first two characters were black, next two were green and last one was yellow
-     * @return
+     * @return the size of remaining set of words
      */
     std::size_t update(std::string str, std::string status)
     {
@@ -122,7 +122,7 @@ public:
 private:
 
     // A function to filter the existing set of words
-    // func is applied on every word, all words for which func returns true get filtered out
+    // func is applied on every word, all words for which func returns true, get filtered out
     template<class Func>
     void filter(Func func)
     {
@@ -170,6 +170,7 @@ private:
                       { return word[index] == c; });
     }
 
+    // removes all words which contain @c
     void remove(char c)
     {
         return filter([c](const std::string &word)
