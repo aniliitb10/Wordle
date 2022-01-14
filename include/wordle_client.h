@@ -6,16 +6,28 @@
 #include <wordle.h>
 #include <util.h>
 #include <algorithm>
+#include <iomanip>
 
 class WordleClient
 {
 public:
-    WordleClient(size_t word_size, size_t display_limit) : _word_size(word_size), _display_limit(display_limit),
-                                                           _wordle(word_size)
+    WordleClient(size_t word_size, size_t display_limit, bool auto_mode) : _word_size(word_size),
+                                                                           _display_limit(display_limit),
+                                                                           _wordle(word_size)
     {
-        std::cout << "Welcome! word size is: [" << _word_size << "], display limit is: [" << _display_limit << "]\n";
+        if (!auto_mode)
+        {
+            std::cout << "Welcome! word size is: [" << _word_size << "], display limit is: [" << _display_limit
+                      << "]\n";
+            run();
+        } else
+        {
+            std::cout << "Welcome! word size is: [" << _word_size << "], auto-mode is on\n";
+            auto_run();
+        }
     }
 
+private:
     // prints status, accepts test string and status
     // runs in infinite loop, unless target word is found or there are no more words in dictionary to suggest
     void run() noexcept
@@ -39,7 +51,26 @@ public:
         std::cout << "Congratulations! you eventually found the word!\n";
     }
 
-private:
+    void auto_run()
+    {
+        while (!_wordle.get_words().empty())
+        {
+            const auto &word = select_a_random_element(_wordle.get_words());
+            print_update(word);
+            auto status = get_status();
+            if (found(status))
+            {
+                std::cout << "Congratulations! you eventually found the word!\n";
+                return;
+            }
+            _wordle.update(word, status);
+        }
+
+        if (_wordle.get_words().empty())
+        {
+            std::cout << "Unable to find any suitable words from dictionary\n";
+        }
+    }
 
     // checks if the target word has been found
     [[nodiscard]] static bool found(const std::string &status) noexcept
@@ -81,36 +112,28 @@ private:
     }
 
     // prints the status on terminal
-    void print_update() const noexcept
-    {
-        if (_wordle.get_words().size() > _display_limit)
-        {
-            std::cout << "There are " << _wordle.get_words().size() << " possible words, try one of these: \n";
-        } else
-        {
-            std::cout << "Only following " << _wordle.get_words().size() << " possible words remaining: \n";
-        }
-
-        for (const auto &word: sample_strings())
-        {
-            std::cout << word << "\n";
-        }
-    }
-
-    // Randomly selects strings from available set to allow users to choose from
-    [[nodiscard]] std::vector<std::string> sample_strings() const noexcept
+    void print_update(const std::string &single_word = "") const noexcept
     {
         const auto &words = _wordle.get_words();
-        if (words.size() > _display_limit)
-        {
-            std::vector<std::string> out{};
-            std::sample(words.begin(), words.end(), std::back_inserter(out),
-                        _display_limit, std::mt19937_64{std::random_device{}()});
-            return out;
-        }
+        assert_statement(!words.empty(), "There are no entries to print!");
 
-        return words;
+        if (words.size() == 1u)
+        {
+            std::cout << "Only possible word is: " << std::quoted(words.front()) << "\n";
+        } else if (!single_word.empty())
+        {
+            std::cout << "\nThere are currently [" << std::setw(5) << words.size() << "] words, try: "
+                      << std::quoted(single_word) << "\n";
+        } else
+        {
+            std::cout << "There are " << words.size() << " possible words, try one of these: \n";
+            for (const auto &word: select_n_random_elements(words, _display_limit))
+            {
+                std::cout << word << "\n";
+             }
+        }
     }
+
 
     std::size_t _word_size;
     std::size_t _display_limit;

@@ -14,10 +14,22 @@
 #include <charconv>
 #include <exception>
 #include <sstream>
+#include <random>
+
+// throws only if status is false
+// no char* to std::string conversion unless status is actually false
+template<typename T=std::runtime_error>
+void assert_statement(bool status, std::string_view details)
+{
+    if (!status)
+    {
+        throw T{std::string{details}};
+    }
+}
 
 // read a file, line by line and strip carriage/new-line characters
 inline
-std::vector<std::string> read_lines(const std::string& filepath, bool ignore_empty = true)
+std::vector<std::string> read_lines(const std::string &filepath, bool ignore_empty = true)
 {
     std::vector<std::string> lines{};
     if (std::ifstream file{filepath}; file.is_open())
@@ -31,27 +43,24 @@ std::vector<std::string> read_lines(const std::string& filepath, bool ignore_emp
             if (!line.empty() && line.back() == '\r')
                 line.erase(std::next(line.end(), -1));
 
-            if(ignore_empty)
+            if (ignore_empty)
             {
                 if (!line.empty())
                     lines.push_back(std::move(line));
-            }
-            else
+            } else
                 lines.push_back(std::move(line));
         }
-    }
-    else
+    } else
         std::cerr << "Failed to open the file: " << filepath << "\n";
 
     return lines;
 }
 
-
 // print a vector!
 inline
-std::ostream& operator<< (std::ostream& ostream, const std::vector<std::string>& strings)
+std::ostream &operator<<(std::ostream &ostream, const std::vector<std::string> &strings)
 {
-    for (auto& str : strings)
+    for (auto &str: strings)
     {
         ostream << str << "\n";
     }
@@ -75,19 +84,24 @@ template<class Func>
     return input;
 }
 
-// if input is not valid, it throws
-template <typename T = std::size_t >
-T from_string(const std::string& src)
+// to select a random element from a std::vector
+template<typename T>
+const T &select_a_random_element(const std::vector<T> &elements)
 {
-    T value{};
+    assert_statement<std::length_error>(!elements.empty(), "There are no elements in the container to choose from!");
+    std::mt19937_64 gen{std::random_device{}()};
+    // -1 as right end is also inclusive
+    std::uniform_int_distribution<std::size_t> dist{0, elements.size() - 1};
+    return elements.at(dist(gen));
+}
 
-    auto res = std::from_chars(src.data(), src.data() + src.size(), value);
-    if (res.ec != std::errc() || res.ptr != src.data() + src.size())
-    {
-        std::stringstream  os;
-        os << "Invalid string received [" << src << "]";
-        throw std::invalid_argument(os.str());
-    }
-    
-    return value;
+// selects a maximum of n elements
+// if vector contains fewer elements, all original elements are returned
+template<typename T>
+std::vector<T> select_n_random_elements(const std::vector<T> &elements, std::size_t n)
+{
+    std::vector<T> out{};
+    std::sample(elements.begin(), elements.end(), std::back_inserter(out), n,
+                std::mt19937_64{std::random_device{}()});
+    return out;
 }

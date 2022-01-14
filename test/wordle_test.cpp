@@ -44,9 +44,9 @@ TEST_F(WordleTest, ComplicatedTest)
 
     for (auto& word : wordle.get_words())
     {
-        EXPECT_NE(word[0], 's');
-        EXPECT_NE(word[1], 't');
-        EXPECT_NE(word[2], 'i');
+        EXPECT_EQ(word.find('s'), std::string::npos);
+        EXPECT_EQ(word.find('t'), std::string::npos);
+        EXPECT_EQ(word.find('i'), std::string::npos);
 
         EXPECT_EQ(word[3], 'n');
         EXPECT_EQ(word[4], 'k');
@@ -55,13 +55,16 @@ TEST_F(WordleTest, ComplicatedTest)
     wordle.update("drunk", "bgbgg");
     for (auto& word : wordle.get_words())
     {
-        EXPECT_NE(word[0], 's');
-        EXPECT_NE(word[0], 'd');
+        // from previous operations
+        EXPECT_EQ(word.find('s'), std::string::npos);
+        EXPECT_EQ(word.find('t'), std::string::npos);
+        EXPECT_EQ(word.find('i'), std::string::npos);
 
+
+        EXPECT_EQ(word.find('d'), std::string::npos);
         EXPECT_EQ(word[1], 'r');
 
-        EXPECT_NE(word[2], 'i');
-        EXPECT_NE(word[2], 'u');
+        EXPECT_EQ(word.find('u'), std::string::npos);
 
         EXPECT_EQ(word[3], 'n');
         EXPECT_EQ(word[4], 'k');
@@ -70,9 +73,14 @@ TEST_F(WordleTest, ComplicatedTest)
     wordle.update("prank", "bgggg");
     for (auto& word : wordle.get_words())
     {
-        EXPECT_NE(word[0], 's');
-        EXPECT_NE(word[0], 'd');
-        EXPECT_NE(word[0], 'p');
+        // from previous operations
+        EXPECT_EQ(word.find('s'), std::string::npos);
+        EXPECT_EQ(word.find('t'), std::string::npos);
+        EXPECT_EQ(word.find('i'), std::string::npos);
+        EXPECT_EQ(word.find('d'), std::string::npos);
+        EXPECT_EQ(word.find('u'), std::string::npos);
+
+        EXPECT_EQ(word.find('p'), std::string::npos);
 
         EXPECT_EQ(word[1], 'r');
         EXPECT_EQ(word[2], 'a');
@@ -83,10 +91,15 @@ TEST_F(WordleTest, ComplicatedTest)
     wordle.update("frank", "bgggg");
     for (auto& word : wordle.get_words())
     {
-        EXPECT_NE(word[0], 's');
-        EXPECT_NE(word[0], 'd');
-        EXPECT_NE(word[0], 'p');
-        EXPECT_NE(word[0], 'f');
+        // from previous operations
+        EXPECT_EQ(word.find('s'), std::string::npos);
+        EXPECT_EQ(word.find('t'), std::string::npos);
+        EXPECT_EQ(word.find('i'), std::string::npos);
+        EXPECT_EQ(word.find('d'), std::string::npos);
+        EXPECT_EQ(word.find('u'), std::string::npos);
+        EXPECT_EQ(word.find('p'), std::string::npos);
+
+        EXPECT_EQ(word.find('f'), std::string::npos);
 
         EXPECT_EQ(word[1], 'r');
         EXPECT_EQ(word[2], 'a');
@@ -97,6 +110,15 @@ TEST_F(WordleTest, ComplicatedTest)
     wordle.update("crank", "ggggg");
     for (auto& word : wordle.get_words())
     {
+        // from previous operations
+        EXPECT_EQ(word.find('s'), std::string::npos);
+        EXPECT_EQ(word.find('t'), std::string::npos);
+        EXPECT_EQ(word.find('i'), std::string::npos);
+        EXPECT_EQ(word.find('d'), std::string::npos);
+        EXPECT_EQ(word.find('u'), std::string::npos);
+        EXPECT_EQ(word.find('p'), std::string::npos);
+        EXPECT_EQ(word.find('f'), std::string::npos);
+
         EXPECT_EQ(word[0], 'c');
         EXPECT_EQ(word[1], 'r');
         EXPECT_EQ(word[2], 'a');
