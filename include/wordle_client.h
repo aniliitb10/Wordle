@@ -7,6 +7,10 @@
 #include <util.h>
 #include <algorithm>
 #include <iomanip>
+#include <common_words.h>
+#include <frequent_words.h>
+#include "words.h"
+
 
 class WordleClient
 {
@@ -20,7 +24,8 @@ public:
             std::cout << "Welcome! word size is: [" << _word_size << "], display limit is: [" << _display_limit
                       << "]\n";
             run();
-        } else
+        }
+        else
         {
             std::cout << "Welcome! word size is: [" << _word_size << "], auto-mode is on\n";
             auto_run();
@@ -53,9 +58,9 @@ private:
 
     void auto_run()
     {
-        while (!_wordle.get_words().empty())
+        while (_wordle.size() != 0)
         {
-            const auto &word = select_a_random_element(_wordle.get_words());
+            auto word = _wordle.get_n_words(1u).front();
             print_update(word);
             auto status = get_status();
             if (found(status))
@@ -75,28 +80,27 @@ private:
     // checks if the target word has been found
     [[nodiscard]] static bool found(const std::string &status) noexcept
     {
-        return std::all_of(status.cbegin(), status.cend(), [](char c)
-        { return c == 'g'; });
+        return std::all_of(status.cbegin(), status.cend(), [](char c) { return c == 'g'; });
     }
 
     // reads valid word from terminal
     // if user enters status instead, user gets another chance to enter word again
     [[nodiscard]] std::string get_word() const noexcept
     {
+        static auto const alpha_validator = [](unsigned char c) { return std::isalpha(c); };
+        static auto const y_n_validator = [](char c) { return c == 'y' || c == 'n'; };
+        static auto const status_validator = [](char c) { return c == 'b' || c == 'g' || c == 'y'; };
+
         std::cout << "Enter the selected word: ";
-        std::string input = get_valid_input(_word_size, [](unsigned char c)
-        { return std::isalpha(c); });
-        if (std::all_of(input.cbegin(), input.cend(), [](char c)
-        { return c == 'b' || c == 'g' || c == 'y'; }))
+        std::string input = get_valid_input(_word_size, alpha_validator);
+        if (std::all_of(input.cbegin(), input.cend(), status_validator))
         {
             std::cout << "Did you just enter status instead of words (y/n)? ";
-            std::string ans = get_valid_input(1u, [](char c)
-            { return c == 'y' || c == 'n'; });
+            std::string ans = get_valid_input(1u, y_n_validator);
             if (ans == "y")
             {
                 std::cout << "Okay! Try again (last chance though)! Enter the selected word: ";
-                return get_valid_input(_word_size, [](unsigned char c)
-                { return std::isalpha(c); });
+                return get_valid_input(_word_size, alpha_validator);
             }
         }
 
@@ -107,30 +111,31 @@ private:
     [[nodiscard]] std::string get_status() const noexcept
     {
         std::cout << "Enter the status of previous word: ";
-        return get_valid_input(_word_size, [](char c)
-        { return c == 'b' || c == 'g' || c == 'y'; });
+        return get_valid_input(_word_size, [](char c) { return c == 'b' || c == 'g' || c == 'y'; });
     }
 
     // prints the status on terminal
     void print_update(const std::string &single_word = "") const noexcept
     {
-        const auto &words = _wordle.get_words();
+        const auto &words = _wordle.get_n_words(_display_limit);
         assert_statement(!words.empty(), "There are no entries to print!");
 
         if (words.size() == 1u)
         {
             std::cout << "Only possible word is: " << std::quoted(words.front()) << "\n";
-        } else if (!single_word.empty())
+        }
+        else if (!single_word.empty())
         {
-            std::cout << "\nThere are currently [" << std::setw(5) << words.size() << "] words, try: "
+            std::cout << "\nThere are currently [" << std::setw(5) << _wordle.size() << "] words, try: "
                       << std::quoted(single_word) << "\n";
-        } else
+        }
+        else
         {
-            std::cout << "There are " << words.size() << " possible words, try one of these: \n";
-            for (const auto &word: select_n_random_elements(words, _display_limit))
+            std::cout << "There are " << _wordle.size() << " possible words, try one of these: \n";
+            for (const auto &word: _wordle.get_n_words(_display_limit))
             {
                 std::cout << word << "\n";
-             }
+            }
         }
     }
 

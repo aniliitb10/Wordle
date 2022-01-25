@@ -2,20 +2,28 @@
 #include <wordle.h>
 #include <vector>
 #include <string>
+#include <frequent_words.h>
 
 #include "test_util.h"
 
-using strings_t = std::vector<std::string>;
+using strings_t = std::vector<std::pair<std::string, std::size_t>>;
 
 struct WordleTest : ::testing::Test
 {
+    static std::vector<std::string> extract_strings(const std::vector<std::pair<std::string, std::size_t>>& data)
+    {
+        std::vector<std::string> result{};
+        std::transform(data.begin(), data.end(), std::back_inserter(result),
+                       [](const std::pair<std::string, std::size_t>& entry) {return entry.first; });
+        return result;
+    }
 };
 
 TEST_F(WordleTest, SimpleTest)
 {
-    strings_t strings{"abc", "bcd", "pqr", "abf", "abr"};
-    Wordle wordle{3, strings};
-    EXPECT_TRUE(util::compare(wordle.get_words(), strings));
+    strings_t strings{{"abc", 1}, {"bcd", 1}, {"pqr",1}, {"abf",1}, {"abr",1}};
+    Wordle wordle{3, std::make_shared<FrequentWords>(strings, 3)};
+    EXPECT_TRUE(util::compare(wordle.get_words(), extract_strings(strings)));
 
     wordle.update("abf", "ggb");
     EXPECT_TRUE(util::compare(wordle.get_words(), util::get_vector({"abc", "abr"})));
@@ -26,9 +34,9 @@ TEST_F(WordleTest, SimpleTest)
 
 TEST_F(WordleTest, SimpleTest2)
 {
-    strings_t strings{"abc", "bcd", "pqr", "abf", "abr"};
-    Wordle wordle{3, strings};
-    EXPECT_TRUE(util::compare(wordle.get_words(), strings));
+    strings_t strings{{"abc",1}, {"bcd",1}, {"pqr",1}, {"abf",1}, {"abr",1}};
+    Wordle wordle{3, std::make_shared<FrequentWords>(strings, 3)};
+    EXPECT_TRUE(util::compare(wordle.get_words(), extract_strings(strings)));
 
     wordle.update("abf", "ggb");
     EXPECT_TRUE(util::compare(wordle.get_words(), util::get_vector({"abc", "abr"})));

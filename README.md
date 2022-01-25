@@ -18,12 +18,50 @@ Please note that:
       
   3) It is also possible that the correct ans is not in the dictionary used by the program, then program returns.
   4) There is also a main.cpp but this is just used to run tests, wordle_client_main.cpp is the file which should be built/run to play the game!
+  5) Words are suggested as per their frequency in the language, source: [english-word-frequency](https://www.kaggle.com/rtatman/english-word-frequency)
 
 
 # How to build
 There is a CMakeLists.txt file to help build this project
 
 # How to run
+Introduced command line arguments, see: [argparse](https://github.com/aniliitb10/ArgParser)
+```
+user$ ./WordleClient --help
+A Wordle client!
+Following is a list of configured arguments:
+-h, --help
+	description: to get this message
+-w, --width
+	description: Width of each word in the game, default: 5
+-a, --auto
+	description: To enable auto mode, set to false by default, default: false
+-d, --display_limit
+	description: Number of suggestions for next word, useful only if auto-mode is off, default: 10
+```
+Next, try auto mode, where the app suggests just one word, and you need to use that
+
+```
+user$ ./WordleClient --auto=true
+Welcome! word size is: [5], auto-mode is on
+
+There are currently [ 7872] words, try: "about"
+Enter the status of previous word: ybbbb
+
+There are currently [ 1446] words, try: "email"
+Enter the status of previous word: bbgbb
+
+There are currently [  118] words, try: "grand"
+Enter the status of previous word: bbgbb
+
+There are currently [   21] words, try: "shack"
+Enter the status of previous word: bgggg
+
+There are currently [    2] words, try: "whack"
+Enter the status of previous word: ggggg
+Congratulations! you eventually found the word!
+```
+But what if you don't like its suggested word and want to choose your own? Try manual mode (auto is disabled by default)
 ```
 user$ ./WordleClient
 Welcome! word size is: [5], display limit is: [10]
