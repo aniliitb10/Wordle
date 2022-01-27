@@ -9,6 +9,11 @@
 #include <util.h>
 #include <memory>
 
+/**
+ * An interface to manage a potential list of words for wordle
+ * and to keep updating the list as per the feedback from the game
+ */
+
 class Words
 {
 public:

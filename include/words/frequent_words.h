@@ -7,8 +7,14 @@
 #include <map>
 #include <algorithm>
 #include <util.h>
-#include <words.h>
+#include <words/words.h>
 
+
+/**
+ * A class which suggests words based on how frequently they are used in the language
+ * - source: https://www.kaggle.com/rtatman/english-word-frequency
+ * - it also updates potential list of words as per the feedback from the game
+ */
 
 class FrequentWords : public Words
 {

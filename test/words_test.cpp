@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <frequent_words.h>
-#include "words.h"
+#include <words/frequent_words.h>
+#include <words/words.h>
 
 struct WordsTest : public ::testing::Test
 {

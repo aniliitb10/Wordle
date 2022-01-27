@@ -2,15 +2,19 @@
 
 #include <vector>
 #include <string>
-#include <random>
 #include <wordle.h>
 #include <util.h>
 #include <algorithm>
 #include <iomanip>
-#include <common_words.h>
-#include <frequent_words.h>
-#include "words.h"
+#include <words/frequent_words.h>
+#include <words/words.h>
 
+/**
+ * Wordle deals with actually processing the potential list of words
+ * and WordleClient wraps Wordle methods and makes it presentable on screen, e.g.
+ * - Receives user input and prints updates for user
+ * So, to solve a wordle puzzle, this WordleClient should be run from main function
+ */
 
 class WordleClient
 {

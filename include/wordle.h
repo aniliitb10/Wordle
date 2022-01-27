@@ -8,15 +8,13 @@
 #include <type_traits>
 #include <sstream>
 #include <exception>
-#include <frequent_words.h>
-#include <words.h>
-#include <frequent_words.h>
-#include <concepts>
+#include <words/frequent_words.h>
+#include <words/words.h>
 
 /*
- * A program to play and win Wordle (https://www.powerlanguage.co.uk/wordle/)
- * This helps you in filtering out the rejected chars, use the known positions
- * tried with wordle of Jan 7, 2021 and found 'slump' in 4th attempt
+ * A class to predict the words for Wordle (https://www.powerlanguage.co.uk/wordle/)
+ * It expects an implementation of Words which can handle a potential list of words
+ * and updates the potential list based on tye feedback from game
  * */
 class Wordle
 {
@@ -46,21 +44,15 @@ public:
     std::size_t update(std::string str, std::string status)
     {
         static const std::string ALLOWED_STATUS_CHARS{"byg"};
-        if (status.find_first_not_of(ALLOWED_STATUS_CHARS) != std::string::npos)
-        {
-            std::ostringstream os;
-            os << "Invalid status characters in [" << status << "], status characters must be from: ["
-               << ALLOWED_STATUS_CHARS << "]\n";
-            throw std::invalid_argument{os.str()};
-        }
 
-        if (str.size() != _word_size || status.size() != _word_size)
-        {
-            std::ostringstream os;
-            os << "Invalid number of characters in [" << str << "], and [" << status << "], they must contain exactly ["
-               << _word_size << "] characters\n";
-            throw std::invalid_argument{os.str()};
-        }
+        assert_statement<std::invalid_argument>(str.size() == _word_size && status.size() == _word_size,
+                                                "Invalid number of characters in [", str, "], and/or [", status,
+                                                "], they must contain exactly [", _word_size, "] characters");
+
+        assert_statement<std::invalid_argument>(status.find_first_not_of(ALLOWED_STATUS_CHARS) == std::string::npos,
+                                                "Invalid status characters in [", status,
+                                                "], status characters must be from: [",
+                                                ALLOWED_STATUS_CHARS, "]");
 
         for (std::size_t i = 0; i < _word_size; ++i)
         {
